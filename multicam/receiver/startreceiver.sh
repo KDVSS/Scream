@@ -21,3 +21,6 @@ export SENDER_IP
 export UDP_SRC_PORT
 export UDP_PORT_VIDEO
 ./rendermedia.sh $SENDER_IP $UDP_PORT_VIDEO $UDP_SRC_PORT $DATE
+
+
+

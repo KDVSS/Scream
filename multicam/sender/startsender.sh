@@ -37,7 +37,6 @@ SOURCE="Raspberry-Pi-HQ_Camera_12MP"
 #SCREAM_VERSION="V1"
 SCREAM_VERSION="V2"
 
-
 if [ "$SOURCE" == "e-CAM50_CUNX" ]; then
   echo "Starting e-CAM50_CUNX camera(s)"
 
@@ -76,7 +75,6 @@ if [ "$SOURCE" == "Raspberry-Pi-HQ_Camera_12MP" ]; then
   ## /dev/video0
   gst-launch-1.0 -v rtpbin name=rtpbin ! v4l2src device=/dev/video0 ! 'video/x-raw, format=(string)YUY2, width=(int)1920, height=(int)1080, framerate=(fraction)30/1' ! videoconvert ! capssetter replace=true caps="video/x-raw,width=1920,height=1080,format=YUY2,framerate=30/1,colorimetry=bt709,interlace-mode=(string)progressive" ! v4l2h264enc name=video extra-controls="controls,h264_profile=4,h264_level=11,video_bitrate=25000000,video_bitrate_mode=0;" ! 'video/x-h264,profile=(string)high,level=(string)4,framerate=30/1,width=1920, height=1080' ! queue max-size-buffers=2 ! rtph264pay mtu=1300 ! codecctrl media-src=6 port=30001 ! udpsink host=127.0.0.1 port=30000 &
 
-
 fi
 
 if [ "$SOURCE" == "Movie" ]; then
@@ -84,10 +82,11 @@ if [ "$SOURCE" == "Movie" ]; then
   #  from http://ftp.vim.org/ftp/ftp/pub/graphics/blender/demo/movies/BBB/
   MEDIA=~/Downloads/bbb_sunflower_1080p_30fps_normal.mp4
   #MEDIA=~/Downloads/file_example_MP4_1920_18MG.mp4
-
+  
+  #gst-launch-1.0 rtpbin name=rtpbin multifilesrc location=$MEDIA location=$MEDIA loop=true stop-index=-1 ! qtdemux name=demux ! queue ! h264parse ! omxh264dec ! queue ! nvv4l2h264enc name=video iframeinterval=500 control-rate=1 bitrate=1000000 insert-sps-pps=true preset-level=1 profile=2 maxperf-enable=true EnableTwopassCBR=true vbv-size=500000 poc-type=2 ! queue max-size-buffers=2 ! rtph264pay  mtu=1300 ! codecctrl media-src=4 port=30001 ! udpsink host=127.0.0.1 port=30000 &
+  
   gst-launch-1.0 rtpbin name=rtpbin multifilesrc location=$MEDIA location=$MEDIA loop=true stop-index=-1 ! qtdemux name=demux ! queue ! h264parse ! v4l2h264dec ! queue ! v4l2h264enc name=video extra-controls="controls,video_bitrate=1000000,video_bitrate_mode=1;" ! 'video/x-h264,level=(string)4,framerate=30/1' ! queue max-size-buffers=2 ! rtph264pay mtu=1300 ! codecctrl media-src=6 port=30001 ! udpsink host=127.0.0.1 port=30000 &
   
-
 fi
 
 sleep 1

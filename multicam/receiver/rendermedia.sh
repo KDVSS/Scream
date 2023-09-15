@@ -22,15 +22,16 @@
 
 
 # Start SCReAM receiver side
-#./scream/bin/scream_receiver $1 $2 $3 | tee ./Data/scream_$4.txt &
 ./scream/bin/scream_receiver $1 $2 $3 | tee ./scream_$4.txt &
 
-### Ubuntu
-## /dev/video0/
-#gst-launch-1.0 rtpbin name=rtpbin udpsrc port=30112 ! application/x-rtp,media=video,clock-rate=90000,encoding-name=H264 ! rtpjitterbuffer latency=100 ! rtpbin.recv_rtp_sink_0 rtpbin. ! rtph264depay ! h264parse ! avdec_h264 ! videoconvert ! xvimagesink sync=false async=false &
+## /dev/video0
+#gst-launch-1.0 udpsrc port=30112 ! application/x-rtp,media=video,clock-rate=90000,encoding-name=H264 ! rtpjitterbuffer latency=100 ! rtph264depay ! h264parse ! omxh264dec disable-dpb=true ! nvvidconv !  nveglglessink window-x=640 window-y=360 max-lateness=2000000 sync=true & 
 
-### Raspberry
-## /dev/video0/
+## /dev/video1
+#gst-launch-1.0 udpsrc port=30114 ! application/x-rtp,media=video,clock-rate=90000,encoding-name=H264 ! rtpjitterbuffer latency=100 ! rtph264depay ! h264parse ! omxh264dec disable-dpb=true ! nvvidconv ! nveglglessink window-x=960 window-y=0 sync=true &
+
+## For/v4l2h264dec
 #gst-launch-1.0 rtpbin name=rtpbin udpsrc port=30112 ! application/x-rtp,media=video,clock-rate=90000,encoding-name=H264 ! rtpjitterbuffer latency=100 ! rtpbin.recv_rtp_sink_0 rtpbin. ! rtph264depay ! v4l2h264dec ! videoconvert ! xvimagesink sync=false async=false &
 
+## For/avdec_h264
 gst-launch-1.0 rtpbin name=rtpbin udpsrc port=30112 ! application/x-rtp,media=video,clock-rate=90000,encoding-name=H264 ! rtpjitterbuffer latency=100 ! rtph264depay ! avdec_h264 ! videoconvert ! xvimagesink sync=false async=false &

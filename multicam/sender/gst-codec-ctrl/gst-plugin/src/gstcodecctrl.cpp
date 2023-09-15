@@ -114,7 +114,7 @@ void *readControlPortThread(void *arg) {
       guint32 rate; 
       memcpy(&rate, buf, 4);
       rate = ntohl(rate);
-      //g_print("Rate command %d %d\n", filter->media_src, rate);
+      g_print("Rate command %d %d\n", filter->media_src, rate);
       switch (filter->media_src) {
         case 2:
         case 4:
@@ -132,6 +132,7 @@ void *readControlPortThread(void *arg) {
         case 3:
         case 4:
         case 5:
+          g_print("Initial rate %d \n", rate);
           g_object_set(G_OBJECT(filter->encoder), "bitrate", rate, NULL);
           //g_object_set(G_OBJECT(filter->encoder), "peak-bitrate", rate, NULL);
           //g_print("rate %d \n", rate);
@@ -183,7 +184,7 @@ void *readControlPortThread(void *arg) {
 			  if (qp_minI < 0) qp_minI = 0;
 		  }
 		  sprintf(s,"%d,50:%d,50:-1,-1",qp_minP,qp_minI);    
-		  //g_print("%d %d %d \n", rate, qp_minP, qp_minI);
+		  g_print("%d %d %d \n", rate, qp_minP, qp_minI);
 		  g_object_set(G_OBJECT(filter->encoder), "qp-range", s, NULL);
 		  
         if (true && buf[4] == 1 && rate > 3000000) {
@@ -246,7 +247,7 @@ gst_g_codecctrl_class_init (GstCodecCtrlClass * klass)
 static void
 gst_g_codecctrl_init (GstCodecCtrl * filter)
 {
-  //g_print("INIT\n");
+  g_print("INIT\n");
   filter->sinkpad = gst_pad_new_from_static_template (&sink_factory, "sink");
   filter->encoder = NULL;
   filter->media_src = 0; // x264enc
