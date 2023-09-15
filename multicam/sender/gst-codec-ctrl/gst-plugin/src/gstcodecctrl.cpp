@@ -109,35 +109,44 @@ void *readControlPortThread(void *arg) {
   for (;;) {
 	   nn++;
     //int recvlen = recvfrom(fd_cmd, buf, BUFSIZE, 0, (struct sockaddr *)&incoming_cmd_addr, &addrlen_incoming_cmd_addr); 
-    int recvlen = recv(fd_cmd, buf, BUFSIZE, 0); 
+    int recvlen = recv(fd_cmd, buf, BUFSIZE, 0);
     if (recvlen > 0) {
       guint32 rate; 
       memcpy(&rate, buf, 4);
       rate = ntohl(rate);
-      //g_print("Rate command %d %d\n", filter->media_src, rate);
+      g_print("Rate command %d %d\n", filter->media_src, rate);
       switch (filter->media_src) {
         case 2:
         case 4:
         case 5:
-		//rate *= 1000;
-		break;
-		default:	
-		rate /= 1000;	
-		break;
-	  }
+          //rate *= 1000;
+        break;
+        case 6:
+          rate = 700000;
+        default:	
+          rate /= 1000;
+        break;
+	    }
       switch (filter->media_src) {
         case 0:
         case 1:
         case 3:
         case 4:
         case 5:
+          g_print("Initial rate %d \n", rate);
           g_object_set(G_OBJECT(filter->encoder), "bitrate", rate, NULL);
           //g_object_set(G_OBJECT(filter->encoder), "peak-bitrate", rate, NULL);
-          //g_print(" %d \n", rate);
+          g_print("rate %d \n", rate);
         break;
         case 2:
           g_object_set(G_OBJECT(filter->encoder), "average-bitrate", rate, NULL);
           //g_object_set(G_OBJECT(filter->encoder), "peak-bitrate", int(rate*1.5), NULL);
+        break;
+        case 6:
+          g_print("Case 6 Initial rate %d \n", rate);
+          g_object_set(G_OBJECT(filter->encoder), "video_bitrate", rate, NULL);
+          //g_object_set(G_OBJECT(filter->encoder), "peak-bitrate", rate, NULL);
+          g_print("rate %d \n", rate);
         break;
       }
       if (true && filter->media_src == 4) {
@@ -159,18 +168,15 @@ void *readControlPortThread(void *arg) {
 		  }
 		  
 		  sprintf(s,"%d,50:%d,50:-1,-1",qp_minP,qp_minI);    
-		  //g_print("%d %d %d \n", rate, qp_minP, qp_minI);
+		  g_print("%d %d %d \n", rate, qp_minP, qp_minI);
 		  g_object_set(G_OBJECT(filter->encoder), "qp-range", s, NULL);
 		  
-  
-          if (true && buf[4] == 1 && rate > 3000000) {
-			  GstFlowReturn ret;
-              g_signal_emit_by_name (G_OBJECT(filter->encoder), "force-IDR", NULL, &ret);
-              //g_print("Force IDR %d\n",nn);
-		  }
-	  }
-	  
-
+        if (true && buf[4] == 1 && rate > 3000000) {
+          GstFlowReturn ret;
+          g_signal_emit_by_name (G_OBJECT(filter->encoder), "force-IDR", NULL, &ret);
+          g_print("Force IDR %d\n",nn);
+        }
+	    }
     }
 
   }
@@ -196,8 +202,8 @@ gst_g_codecctrl_class_init (GstCodecCtrlClass * klass)
 
   g_object_class_install_property (gobject_class, PROP_MEDIA_SRC,
       g_param_spec_uint ("media-src", "Media source",
-        "0=x264enc, 1=rpicamsrc, 2=uvch264src, 3=vaapih264enc, 4=omxh264enc, 5=opusenc",
-        0, 5, 0,
+        "0=x264enc, 1=rpicamsrc, 2=uvch264src, 3=vaapih264enc, 4=omxh264enc, 5=opusenc, 6=v4l2h264enc",
+        0, 6, 0,
         G_PARAM_READWRITE));
   g_object_class_install_property (gobject_class, PROP_CTRL_PORT,
       g_param_spec_uint ("port", "port",
@@ -225,7 +231,7 @@ gst_g_codecctrl_class_init (GstCodecCtrlClass * klass)
 static void
 gst_g_codecctrl_init (GstCodecCtrl * filter)
 {
-  //g_print("INIT\n");
+  g_print("INIT\n");
   filter->sinkpad = gst_pad_new_from_static_template (&sink_factory, "sink");
   filter->encoder = NULL;
   filter->media_src = 0; // x264enc

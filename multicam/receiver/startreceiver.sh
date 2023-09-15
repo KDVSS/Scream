@@ -10,8 +10,12 @@ UDP_SRC_PORT=$(echo $SND_IP_PORT | sed -e 's/.*\.//')
 SENDER_IP=$(echo $SND_IP_PORT | sed 's![^.]*$!!' | sed 's/.$//')
 
 DATE=`date +%y-%m-%d_%H%M%S`
-echo "Video streaming IP address and UDP source port " $SND_IP " " $UDP_SRC_PORT
+echo "Video streaming IP address and UDP source port " $SENDER_IP " " $UDP_SRC_PORT
 
-export SND_IP
+export SENDER_IP
 export UDP_SRC_PORT
+export UDP_PORT_VIDEO
 ./rendermedia.sh $SENDER_IP $UDP_PORT_VIDEO $UDP_SRC_PORT $DATE
+
+
+
