@@ -95,7 +95,6 @@ if [ "$SOURCE" == "Movie" ]; then
   #  from http://ftp.vim.org/ftp/ftp/pub/graphics/blender/demo/movies/BBB/
   MEDIA=/home/dhana-pi/Downloads/bbb_sunflower_1080p_30fps_normal.mp4
   
-  #gst-launch-1.0 rtpbin name=rtpbin multifilesrc location=$MEDIA location=$MEDIA loop=true stop-index=-1 ! qtdemux name=demux ! queue ! h264parse ! omxh264dec ! queue ! nvv4l2h264enc name=video iframeinterval=500 control-rate=1 bitrate=1000000 insert-sps-pps=true preset-level=1 profile=2 maxperf-enable=true EnableTwopassCBR=true vbv-size=500000 poc-type=2 ! queue max-size-buffers=2 ! rtph264pay  mtu=1300 ! codecctrl media-src=4 port=30001 ! udpsink host=127.0.0.1 port=30000 &
 
   
   gst-launch-1.0 rtpbin name=rtpbin multifilesrc location=$MEDIA location=$MEDIA loop=true stop-index=-1 ! qtdemux name=demux ! queue ! h264parse ! v4l2h264dec ! queue ! v4l2h264enc name=video extra-controls="controls,video_bitrate=6000000,video_bitrate_mode=1;" ! 'video/x-h264,level=(string)4' ! queue max-size-buffers=2 ! rtph264pay  mtu=1300 ! codecctrl media-src=6 port=30001 ! udpsink host=127.0.0.1 port=30000 &

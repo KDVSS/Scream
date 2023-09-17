@@ -90,6 +90,7 @@ void *readControlPortThread(void *arg) {
   guint8 buf[BUFSIZE];
   struct sockaddr_in incoming_cmd_addr;
   int fd_cmd;
+  //char ss[100];
   incoming_cmd_addr.sin_family = AF_INET;
   incoming_cmd_addr.sin_port = htons(filter->ctrl_port);
   incoming_cmd_addr.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -114,15 +115,14 @@ void *readControlPortThread(void *arg) {
       guint32 rate; 
       memcpy(&rate, buf, 4);
       rate = ntohl(rate);
-      g_print("Rate command %d %d\n", filter->media_src, rate);
+      //g_print("Rate command %d %d\n", filter->media_src, rate);
       switch (filter->media_src) {
         case 2:
         case 4:
         case 5:
+        case 6:
           //rate *= 1000;
         break;
-        case 6:
-          rate = 700000;
         default:	
           rate /= 1000;
         break;
@@ -143,10 +143,28 @@ void *readControlPortThread(void *arg) {
           //g_object_set(G_OBJECT(filter->encoder), "peak-bitrate", int(rate*1.5), NULL);
         break;
         case 6:
-          g_print("Case 6 Initial rate %d \n", rate);
-          g_object_set(G_OBJECT(filter->encoder), "video_bitrate", rate, NULL);
-          //g_object_set(G_OBJECT(filter->encoder), "peak-bitrate", rate, NULL);
-          g_print("rate %d \n", rate);
+          gchar *str;
+          GstStructure *extra_controls;
+
+          g_object_get(G_OBJECT(filter->encoder), "extra-controls", &extra_controls, NULL);
+
+          if (extra_controls == NULL)
+          {
+            str = g_strdup_printf("controls,"
+                                  "video_bitrate_mode=1,"
+                                  "video_bitrate=%d", rate);
+            extra_controls = gst_structure_from_string(str, NULL);
+            g_free(str);
+          } else {
+                gst_structure_set(extra_controls,
+                                  "video_bitrate", G_TYPE_INT, rate,                                
+                                  NULL);
+          }
+          /*g_print("Setting encoder extra-controls=%s\n",
+                    gst_structure_to_string(extra_controls));*/
+          g_object_set(G_OBJECT(filter->encoder), "extra-controls", extra_controls, NULL);
+
+          gst_structure_free(extra_controls);
         break;
       }
       if (true && filter->media_src == 4) {
@@ -166,7 +184,7 @@ void *readControlPortThread(void *arg) {
 			  if (qp_minI > 51) qp_minI = 51;
 			  if (qp_minI < 0) qp_minI = 0;
 		  }
-		  
+		  //extra-controls="controls,video_bitrate=6000000,video_bitrate_mode=1;"
 		  sprintf(s,"%d,50:%d,50:-1,-1",qp_minP,qp_minI);    
 		  g_print("%d %d %d \n", rate, qp_minP, qp_minI);
 		  g_object_set(G_OBJECT(filter->encoder), "qp-range", s, NULL);
