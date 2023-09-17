@@ -90,7 +90,6 @@ void *readControlPortThread(void *arg) {
   guint8 buf[BUFSIZE];
   struct sockaddr_in incoming_cmd_addr;
   int fd_cmd;
-  //char ss[100];
   incoming_cmd_addr.sin_family = AF_INET;
   incoming_cmd_addr.sin_port = htons(filter->ctrl_port);
   incoming_cmd_addr.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -133,10 +132,9 @@ void *readControlPortThread(void *arg) {
         case 3:
         case 4:
         case 5:
-          g_print("Initial rate %d \n", rate);
           g_object_set(G_OBJECT(filter->encoder), "bitrate", rate, NULL);
           //g_object_set(G_OBJECT(filter->encoder), "peak-bitrate", rate, NULL);
-          g_print("rate %d \n", rate);
+          //g_print("rate %d \n", rate);
         break;
         case 2:
           g_object_set(G_OBJECT(filter->encoder), "average-bitrate", rate, NULL);
@@ -184,9 +182,8 @@ void *readControlPortThread(void *arg) {
 			  if (qp_minI > 51) qp_minI = 51;
 			  if (qp_minI < 0) qp_minI = 0;
 		  }
-		  //extra-controls="controls,video_bitrate=6000000,video_bitrate_mode=1;"
 		  sprintf(s,"%d,50:%d,50:-1,-1",qp_minP,qp_minI);    
-		  g_print("%d %d %d \n", rate, qp_minP, qp_minI);
+		  //g_print("%d %d %d \n", rate, qp_minP, qp_minI);
 		  g_object_set(G_OBJECT(filter->encoder), "qp-range", s, NULL);
 		  
         if (true && buf[4] == 1 && rate > 3000000) {
@@ -249,7 +246,7 @@ gst_g_codecctrl_class_init (GstCodecCtrlClass * klass)
 static void
 gst_g_codecctrl_init (GstCodecCtrl * filter)
 {
-  g_print("INIT\n");
+  //g_print("INIT\n");
   filter->sinkpad = gst_pad_new_from_static_template (&sink_factory, "sink");
   filter->encoder = NULL;
   filter->media_src = 0; // x264enc
