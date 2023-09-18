@@ -33,7 +33,9 @@ MAX_TOTAL_RATE=60000
 # Select type of camera here
 #SOURCE="e-CAM50_CUNX"
 SOURCE="Raspberry-Pi-HQ_Camera_12MP"
-#SOURCE="Movie" 
+#SOURCE="Movie"
+#SCREAM_VERSION="V1"
+SCREAM_VERSION="V2"
 
 
 if [ "$SOURCE" == "e-CAM50_CUNX" ]; then
@@ -78,7 +80,7 @@ if [ "$SOURCE" == "Raspberry-Pi-HQ_Camera_12MP" ]; then
 fi
 
 if [ "$SOURCE" == "Movie" ]; then
-  # Download the big buck bunny 1080p60fps movie 
+  # Download the big buck bunny 1080p60fps movie
   #  from http://ftp.vim.org/ftp/ftp/pub/graphics/blender/demo/movies/BBB/
   MEDIA=~/Downloads/bbb_sunflower_1080p_30fps_normal.mp4
   #MEDIA=~/Downloads/file_example_MP4_1920_18MG.mp4
@@ -96,10 +98,11 @@ sleep 1
 # ratescale compensates for offset that may occur between target and actual bitrates for the video coder
 # For L4S capability, change to
 #  ./screamTx/bin/scream_sender -ect 1
-# For new CC algorithm add
-#  -newcc and optionally -fincrease X where X is a value in range ]0.0 10]
 
 echo "Video streaming started"
+if [ "$SCREAM_VERSION" == "V1" ]; then
 ./scream/bin/scream_sender -ect 1 -delaytarget $NETWORK_QUEUE_DELAY_TARGET -priority 1.0:0.5 -ratemax 25000:25000 -ratemin 2000:2000 -rateinit 5000:5000 -ratescale 1.0:1.0 -cwvmem 60 -maxtotalrate  $MAX_TOTAL_RATE -pacingheadroom 1.2 2 $RECEIVER_IP $UDP_PORT_VIDEO &
-
-
+fi
+if [ "$SCREAM_VERSION" == "V2" ]; then
+./scream/bin/scream_sender -ect 1 -delaytarget $NETWORK_QUEUE_DELAY_TARGET -priority 1.0:0.5 -ratemax 25000:25000 -ratemin 2000:2000 -rateinit 5000:5000 -ratescale 1.0:1.0 -maxtotalrate  $MAX_TOTAL_RATE -pacingheadroom 1.5 2 $RECEIVER_IP $UDP_PORT_VIDEO &
+fi
