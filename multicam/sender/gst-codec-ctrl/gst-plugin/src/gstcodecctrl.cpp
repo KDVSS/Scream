@@ -158,8 +158,8 @@ void *readControlPortThread(void *arg) {
                                   "video_bitrate", G_TYPE_INT, rate,                                
                                   NULL);
           }
-          /*g_print("Setting encoder extra-controls=%s\n",
-                    gst_structure_to_string(extra_controls));*/
+          g_print("Setting encoder extra-controls=%s\n",
+                    gst_structure_to_string(extra_controls));
           g_object_set(G_OBJECT(filter->encoder), "extra-controls", extra_controls, NULL);
 
           gst_structure_free(extra_controls);
