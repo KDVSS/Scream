@@ -158,8 +158,8 @@ void *readControlPortThread(void *arg) {
                                   "video_bitrate", G_TYPE_INT, rate,                                
                                   NULL);
           }
-          g_print("Setting encoder extra-controls=%s\n",
-                    gst_structure_to_string(extra_controls));
+          /* g_print("Setting encoder extra-controls=%s\n",
+                    gst_structure_to_string(extra_controls));*/
           g_object_set(G_OBJECT(filter->encoder), "extra-controls", extra_controls, NULL);
 
           gst_structure_free(extra_controls);
@@ -172,7 +172,7 @@ void *readControlPortThread(void *arg) {
 		  char s[100];
 		  int qp_minI=1;
 		  int qp_minP=1;
-          int rateI = (rate+500000)/1000000; // Integer rate in Mbps
+		  int rateI = (rate+500000)/1000000; // Integer rate in Mbps
 		  if (true) {
 			  /*
 			   * Increased qp_min at low rates
