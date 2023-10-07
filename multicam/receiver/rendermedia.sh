@@ -22,7 +22,7 @@
 
 
 # Start SCReAM receiver side
-./scream/bin/scream_receiver $1 $2 $3 | tee ./Data/scream_$4.txt &
+./scream/bin/scream_receiver $1 $2 $3 | tee ./scream_$4.txt &
 
 ## /dev/video0
 #gst-launch-1.0 udpsrc port=30112 ! application/x-rtp,media=video,clock-rate=90000,encoding-name=H264 ! rtpjitterbuffer latency=100 ! rtph264depay ! h264parse ! omxh264dec disable-dpb=true ! nvvidconv ! nveglglessink window-x=640 window-y=360 max-lateness=2000000 sync=true & 

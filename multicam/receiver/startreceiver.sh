@@ -15,8 +15,8 @@ export SENDER_IP=192.168.1.137
 export UDP_SRC_PORT=$UDP_PORT_VIDEO
 
 DATE=`date +%y-%m-%d_%H%M%S`
-echo "Video streaming IP address and UDP source port " $SND_IP " " $UDP_SRC_PORT
+echo "Video streaming IP address and UDP source port " $SENDER_IP " " $UDP_SRC_PORT
 
-export SND_IP
+export SENDER_IP
 export UDP_SRC_PORT
 ./rendermedia.sh $SENDER_IP $UDP_PORT_VIDEO $UDP_SRC_PORT $DATE

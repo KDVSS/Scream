@@ -119,11 +119,12 @@ void *readControlPortThread(void *arg) {
         case 2:
         case 4:
         case 5:
-		//rate *= 1000;
-		break;
-		default:	
-		rate /= 1000;	
-		break;
+	case 6:
+	  //rate *= 1000;
+	break;
+	default:
+	  rate /= 1000;
+	break;
 	  }
       switch (filter->media_src) {
         case 0:
@@ -165,38 +166,33 @@ void *readControlPortThread(void *arg) {
         break;
       }
       if (true && filter->media_src == 4) {
-		  /*
-		   * Adaptive qp_min to to avoid large key frames at low bitrates 
-		   */
-		  char s[100];
-		  int qp_minI=1;
-		  int qp_minP=1;
-		  int rateI = (rate+500000)/1000000; // Integer rate in Mbps
-		  if (true) {
-			  /*
-			   * Increased qp_min at low rates
-			   *  reduces bitrate spikes
-			   */
-			  qp_minI=52-rateI/4; 
-			  if (qp_minI > 51) qp_minI = 51;
-			  if (qp_minI < 0) qp_minI = 0;
-		  }
-		  
-		  sprintf(s,"%d,50:%d,50:-1,-1",qp_minP,qp_minI);    
-		  //g_print("%d %d %d \n", rate, qp_minP, qp_minI);
-		  g_object_set(G_OBJECT(filter->encoder), "qp-range", s, NULL);
-		  
-  
-          if (true && buf[4] == 1 && rate > 3000000) {
-			  GstFlowReturn ret;
-              g_signal_emit_by_name (G_OBJECT(filter->encoder), "force-IDR", NULL, &ret);
-              //g_print("Force IDR %d\n",nn);
-		  }
-	  }
-	  
+	/*
+	 * Adaptive qp_min to to avoid large key frames at low bitrates
+	 */
+	char s[100];
+	int qp_minI=1;
+	int qp_minP=1;
+	int rateI = (rate+500000)/1000000; // Integer rate in Mbps
+	if (true) {
+	  /*
+	   * Increased qp_min at low rates
+	   *  reduces bitrate spikes
+	   */
+	  qp_minI=52-rateI/4;
+	  if (qp_minI > 51) qp_minI = 51;
+	  if (qp_minI < 0) qp_minI = 0;
+	}
+	sprintf(s,"%d,50:%d,50:-1,-1",qp_minP,qp_minI); 
+	//g_print("%d %d %d \n", rate, qp_minP, qp_minI);
+	g_object_set(G_OBJECT(filter->encoder), "qp-range", s, NULL);
 
+	if (true && buf[4] == 1 && rate > 3000000) {
+			GstFlowReturn ret;
+	    g_signal_emit_by_name (G_OBJECT(filter->encoder), "force-IDR", NULL, &ret);
+	    //g_print("Force IDR %d\n",nn);
+	}
+      }
     }
-
   }
   return NULL;
 }
@@ -220,9 +216,9 @@ gst_g_codecctrl_class_init (GstCodecCtrlClass * klass)
 
   g_object_class_install_property (gobject_class, PROP_MEDIA_SRC,
       g_param_spec_uint ("media-src", "Media source",
-        "0=x264enc, 1=rpicamsrc, 2=uvch264src, 3=vaapih264enc, 4=omxh264enc, 5=opusenc",
-        0, 5, 0,
-        G_PARAM_READWRITE));
+        "0=x264enc, 1=rpicamsrc, 2=uvch264src, 3=vaapih264enc, 4=omxh264enc, 5=opusenc, 6=v4l2h264enc",
+	0, 6, 0,
+	G_PARAM_READWRITE));
   g_object_class_install_property (gobject_class, PROP_CTRL_PORT,
       g_param_spec_uint ("port", "port",
         "",
